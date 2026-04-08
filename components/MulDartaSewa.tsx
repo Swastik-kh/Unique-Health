@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ClipboardList, Plus, X, Pencil, Trash2, Search, Printer } from 'lucide-react';
-import { ServiceSeekerRecord, User, OrganizationSettings } from '../types/coreTypes';
+import { ServiceSeekerRecord, User, OrganizationSettings, ServiceItem } from '../types/coreTypes';
 import { Input } from './Input';
 import { NepaliDatePicker } from './NepaliDatePicker';
 import { PatientSticker } from './PatientSticker';
@@ -11,6 +11,7 @@ import NepaliDate from 'nepali-date-converter';
 
 interface MulDartaSewaProps {
   records: ServiceSeekerRecord[];
+  serviceItems: ServiceItem[];
   onSaveRecord: (record: ServiceSeekerRecord) => void;
   onDeleteRecord: (recordId: string) => void;
   currentFiscalYear: string;
@@ -36,10 +37,11 @@ const initialFormData: Omit<ServiceSeekerRecord, 'id' | 'fiscalYear'> = {
   phone: '',
   serviceType: 'OPD',
   visitType: 'New',
+  serviceFee: 0,
   remarks: '',
 };
 
-export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSaveRecord, onDeleteRecord, currentFiscalYear, currentUser, generalSettings }) => {
+export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], serviceItems = [], onSaveRecord, onDeleteRecord, currentFiscalYear, currentUser, generalSettings }) => {
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [printRecord, setPrintRecord] = useState<ServiceSeekerRecord | null>(null);
@@ -128,7 +130,7 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
               const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
               return dateStr.replace(/[0-9]/g, (digit) => nepaliDigits[parseInt(digit)]);
             })()} ${timeString}</p>
-            <p><strong>Service Charge:</strong> Rs. 50</p>
+            <p><strong>Service Charge:</strong> Rs. ${record.serviceFee || 0}</p>
             <div class="footer"><strong>User:</strong> ${currentUser?.fullName || 'System'}</div>
           </div>
           <div class="qr-code">
@@ -229,11 +231,19 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
     // Auto-populate today's date
     const today = new NepaliDate().format('YYYY-MM-DD');
 
+    // Find "Mul darta" service fee
+    const mulDartaService = serviceItems.find(s => 
+      s.serviceName.toLowerCase().includes('mul darta') || 
+      s.serviceName.toLowerCase().includes('मूल दर्ता')
+    );
+    const defaultFee = mulDartaService ? mulDartaService.rate : 0;
+
     setFormData({ 
       ...initialFormData, 
       uniquePatientId: newUniqueId,
       registrationNumber: nextRegNum,
-      date: today
+      date: today,
+      serviceFee: defaultFee
     });
     setShowForm(true);
   };
@@ -295,7 +305,7 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
       }
     }
 
-    const finalValue = (name === 'ageYears' || name === 'ageMonths' || name === 'ageDays') ? parseInt(value) || 0 : value;
+    const finalValue = (name === 'ageYears' || name === 'ageMonths' || name === 'ageDays' || name === 'serviceFee') ? parseFloat(value) || 0 : value;
     setFormData(prev => ({ ...prev, [name]: finalValue }));
   };
 
@@ -455,6 +465,7 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
                 <th className="p-4">फोन</th>
                 <th className="p-4">सेवाको प्रकार</th>
                 <th className="p-4">किसिम</th>
+                <th className="p-4 text-right">शुल्क</th>
                 <th className="p-4 text-right">कार्य</th>
               </tr>
             </thead>
@@ -480,6 +491,7 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
                       {record.visitType}
                     </span>
                   </td>
+                  <td className="p-4 text-right font-bold text-slate-700">Rs. {record.serviceFee || 0}</td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button onClick={() => handleEdit(record)} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-md transition-colors" title="सम्पादन गर्नुहोस्">
@@ -691,6 +703,14 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], onSave
                     <option value="Other">Other (अन्य)</option>
                   </select>
                 </div>
+                <Input 
+                  label="सेवा शुल्क (Service Fee) *" 
+                  name="serviceFee" 
+                  type="number"
+                  value={formData.serviceFee} 
+                  onChange={handleChange} 
+                  required
+                />
                 <div className="md:col-span-3">
                   <Input 
                     label="कैफियत" 

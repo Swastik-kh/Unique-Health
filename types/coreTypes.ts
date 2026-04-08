@@ -306,6 +306,7 @@ export interface ServiceSeekerRecord {
   phone: string;
   serviceType: string; // OPD, Emergency, Vaccination, etc.
   visitType: 'New' | 'Follow-up'; // New or Follow-up
+  serviceFee?: number; // Added field
   fiscalYear: string;
   remarks?: string;
 }

@@ -1119,6 +1119,7 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
       />;
       case 'mul_darta': return <MulDartaSewa 
         records={serviceSeekerRecords}
+        serviceItems={serviceItems}
         onSaveRecord={onSaveServiceSeekerRecord}
         onDeleteRecord={onDeleteServiceSeekerRecord}
         currentFiscalYear={currentFiscalYear}
