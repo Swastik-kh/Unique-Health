@@ -26,6 +26,7 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
   });
 
   const filteredPatients = useMemo(() => {
+    if (!patients) return [];
     return patients.filter(p => {
       const recordDate = new NepaliDate(p.registrationDate);
       const recordYear = recordDate.format('YYYY');
@@ -51,6 +52,7 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
 
   const outcomePatients = useMemo(() => {
     if (reportType !== 'Monthly') return filteredPatients;
+    if (!patients) return [];
     
     const prevYear = (parseInt(selectedYear) - 1).toString();
     return patients.filter(p => {
@@ -102,28 +104,31 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
     const slide1 = pptx.addSlide();
     slide1.addText('Case Registration [1]', { x: 0.5, y: 0.2, fontSize: 20, bold: true });
     const data1 = [
-      { name: 'New', values: [count(p => p.classification === 'PBC' && p.regType === 'New'), count(p => p.classification === 'PCD' && p.regType === 'New'), count(p => p.classification === 'EP' && p.regType === 'New')] },
-      { name: 'Relapse', values: [count(p => p.classification === 'PBC' && p.regType === 'Relapse'), count(p => p.classification === 'PCD' && p.regType === 'Relapse'), count(p => p.classification === 'EP' && p.regType === 'Relapse')] }
+      { name: 'New', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'New'), count(p => p.classification === 'PCD' && p.regType === 'New'), count(p => p.classification === 'EP' && p.regType === 'New')] },
+      { name: 'Relapse', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'Relapse'), count(p => p.classification === 'PCD' && p.regType === 'Relapse'), count(p => p.classification === 'EP' && p.regType === 'Relapse')] }
     ];
-    slide1.addChart(pptx.ChartType.bar, data1, { x: 0.5, y: 0.8, w: '90%', h: '70%', labels: ['PBC', 'PCD', 'EP'] });
+    slide1.addChart(pptx.ChartType.bar, data1, { x: 0.5, y: 0.8, w: '90%', h: '70%' });
 
     // 2. Treatment Regimen Slide
     const slide2 = pptx.addSlide();
     slide2.addText('Treatment Regimen [5]', { x: 0.5, y: 0.2, fontSize: 20, bold: true });
     const data2 = [
-      { name: '2HRZE+4HR', values: [count(p => p.treatmentType === '2HRZE+4HR')] },
-      { name: '2HRZE+7HRE', values: [count(p => p.treatmentType === '2HRZE+7HRE')] },
-      { name: '6HRZE', values: [count(p => p.treatmentType === '6HRZE')] },
-      { name: '6HRZE+Lfx', values: [count(p => p.treatmentType === '6HRZE+Lfx')] }
+      { name: 'Treatment Type', labels: ['2HRZE+4HR', '2HRZE+7HRE', '6HRZE', '6HRZE+Lfx'], values: [count(p => p.treatmentType === '2HRZE+4HR'), count(p => p.treatmentType === '2HRZE+7HRE'), count(p => p.treatmentType === '6HRZE'), count(p => p.treatmentType === '6HRZE+Lfx')] }
     ];
-    slide2.addChart(pptx.ChartType.pie, data2, { x: 0.5, y: 0.8, w: '90%', h: '70%' });
+    slide2.addChart(pptx.ChartType.pie, data2, { 
+      x: 0.5, 
+      y: 0.8, 
+      w: '90%', 
+      h: '70%', 
+      showLabel: true 
+    });
 
     // 3. Treatment Outcome Slide
     const slide3 = pptx.addSlide();
     slide3.addText('Treatment Outcome [12]', { x: 0.5, y: 0.2, fontSize: 20, bold: true });
     const outcomes = ['Cured', 'Completed', 'Failed', 'Died', 'Lost to follow up', 'Not Evaluated'];
-    const data3 = [{ name: 'Patients', values: outcomes.map(o => outcomeCount(p => getOutcome(p) === o)) }];
-    slide3.addChart(pptx.ChartType.bar, data3, { x: 0.5, y: 0.8, w: '90%', h: '70%', labels: outcomes });
+    const data3 = [{ name: 'Patients', labels: outcomes, values: outcomes.map(o => outcomeCount(p => getOutcome(p) === o)) }];
+    slide3.addChart(pptx.ChartType.bar, data3, { x: 0.5, y: 0.8, w: '90%', h: '70%' });
     
     pptx.writeFile({ fileName: `TBDST_Report_${new Date().toISOString().slice(0, 10)}.pptx` });
   };
