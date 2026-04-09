@@ -14,6 +14,7 @@ interface IPDSewaProps {
   billingRecords?: any[];
   onSaveRecord: (record: IPDRecord) => void;
   onDeleteRecord: (recordId: string) => void;
+  onDeleteAllRecords: () => void;
   currentFiscalYear: string;
   currentUser: any;
   generalSettings: OrganizationSettings;
@@ -29,6 +30,7 @@ export const IPDSewa: React.FC<IPDSewaProps> = ({
   billingRecords = [],
   onSaveRecord, 
   onDeleteRecord, 
+  onDeleteAllRecords,
   currentFiscalYear,
   currentUser,
   generalSettings,
@@ -69,10 +71,14 @@ export const IPDSewa: React.FC<IPDSewaProps> = ({
       alert('तपाईंलाई यो रेकर्ड मेटाउने अनुमति छैन।');
       return;
     }
-    if (!canDeletePatient(admission.serviceSeekerId)) {
+
+    const patientExists = serviceSeekerRecords.some(p => p.id === admission.serviceSeekerId);
+
+    if (patientExists && !canDeletePatient(admission.serviceSeekerId)) {
       alert('यो बिरामीको अन्य सेवाहरूमा रेकर्ड छ, त्यसैले मेटाउन मिल्दैन।');
       return;
     }
+
     if (window.confirm('के तपाईं यो भर्ना रेकर्ड मेटाउन निश्चित हुनुहुन्छ?')) {
       onDeleteRecord(admission.id);
       setShowPatientDetails(null);
@@ -343,15 +349,22 @@ export const IPDSewa: React.FC<IPDSewaProps> = ({
             <div className="p-6">
               {activeTab === 'all-patients' && (
                 <div className="space-y-6">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 text-slate-400" size={18} />
-                    <input
-                      type="text"
-                      placeholder="दर्ता नं, बिरामी ID वा नामबाट खोज्नुहोस्..."
-                      value={searchId}
-                      onChange={(e) => setSearchId(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500"
-                    />
+                  <div className="flex justify-between items-center">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+                        <input
+                        type="text"
+                        placeholder="दर्ता नं, बिरामी ID वा नामबाट खोज्नुहोस्..."
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500"
+                        />
+                    </div>
+                    {currentUser?.role === 'admin' && (
+                        <button onClick={onDeleteAllRecords} className="ml-4 flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold shadow-sm hover:bg-red-700">
+                            <Trash2 size={18} /> सबै मेटाउनुहोस्
+                        </button>
+                    )}
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
@@ -708,6 +721,7 @@ export const IPDSewa: React.FC<IPDSewaProps> = ({
       {showSettings && (
         <WardSettingsModal 
           initialWards={wards}
+          activeAdmissions={activeAdmissions}
           onSave={handleSaveWards}
           onClose={() => setShowSettings(false)}
         />
@@ -941,11 +955,12 @@ const MedicationManager: React.FC<MedicationManagerProps> = ({ medications, onCh
 
 interface WardSettingsModalProps {
   initialWards: WardConfig[];
+  activeAdmissions: IPDRecord[];
   onSave: (wards: WardConfig[]) => void;
   onClose: () => void;
 }
 
-const WardSettingsModal: React.FC<WardSettingsModalProps> = ({ initialWards, onSave, onClose }) => {
+const WardSettingsModal: React.FC<WardSettingsModalProps> = ({ initialWards, activeAdmissions, onSave, onClose }) => {
   const [wards, setWards] = useState<WardConfig[]>(initialWards);
 
   const addWard = () => {
@@ -957,8 +972,13 @@ const WardSettingsModal: React.FC<WardSettingsModalProps> = ({ initialWards, onS
     setWards([...wards, newWard]);
   };
 
-  const removeWard = (id: string) => {
-    setWards(wards.filter(w => w.id !== id));
+  const removeWard = (ward: WardConfig) => {
+    const isOccupied = activeAdmissions.some(a => a.wardName === ward.name);
+    if (isOccupied) {
+      alert(`यो वार्ड (${ward.name}) मा बिरामीहरू भर्ना भएका छन्, त्यसैले मेटाउन मिल्दैन।`);
+      return;
+    }
+    setWards(wards.filter(w => w.id !== ward.id));
   };
 
   const updateWard = (id: string, field: keyof WardConfig, value: any) => {
@@ -996,7 +1016,7 @@ const WardSettingsModal: React.FC<WardSettingsModalProps> = ({ initialWards, onS
                 />
               </div>
               <button 
-                onClick={() => removeWard(ward.id)}
+                onClick={() => removeWard(ward)}
                 className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all mb-1"
               >
                 <Trash2 size={20} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ClipboardList, Plus, X, Pencil, Trash2, Search, Printer } from 'lucide-react';
-import { ServiceSeekerRecord, User, OrganizationSettings, ServiceItem } from '../types/coreTypes';
+import { ServiceSeekerRecord, User, OrganizationSettings, ServiceItem, OPDRecord, EmergencyRecord, CBIMNCIRecord, IPDRecord } from '../types/coreTypes';
 import { Input } from './Input';
 import { NepaliDatePicker } from './NepaliDatePicker';
 import { PatientSticker } from './PatientSticker';
@@ -11,6 +11,10 @@ import NepaliDate from 'nepali-date-converter';
 
 interface MulDartaSewaProps {
   records: ServiceSeekerRecord[];
+  opdRecords: OPDRecord[];
+  emergencyRecords: EmergencyRecord[];
+  cbimnciRecords: CBIMNCIRecord[];
+  ipdRecords: IPDRecord[];
   serviceItems: ServiceItem[];
   onSaveRecord: (record: ServiceSeekerRecord) => void;
   onDeleteRecord: (recordId: string) => void;
@@ -41,7 +45,19 @@ const initialFormData: Omit<ServiceSeekerRecord, 'id' | 'fiscalYear'> = {
   remarks: '',
 };
 
-export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], serviceItems = [], onSaveRecord, onDeleteRecord, currentFiscalYear, currentUser, generalSettings }) => {
+export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ 
+  records = [], 
+  opdRecords = [],
+  emergencyRecords = [],
+  cbimnciRecords = [],
+  ipdRecords = [],
+  serviceItems = [], 
+  onSaveRecord, 
+  onDeleteRecord, 
+  currentFiscalYear, 
+  currentUser, 
+  generalSettings 
+}) => {
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [printRecord, setPrintRecord] = useState<ServiceSeekerRecord | null>(null);
@@ -405,6 +421,21 @@ export const MulDartaSewa: React.FC<MulDartaSewaProps> = ({ records = [], servic
   };
 
   const handleDelete = (id: string) => {
+    const recordToDelete = records.find(r => r.id === id);
+    if (!recordToDelete) return;
+
+    // Check if the patient is registered or admitted in other services
+    const isRegisteredInOtherServices = 
+      opdRecords.some(r => r.uniquePatientId === recordToDelete.uniquePatientId) ||
+      emergencyRecords.some(r => r.uniquePatientId === recordToDelete.uniquePatientId) ||
+      cbimnciRecords.some(r => r.uniquePatientId === recordToDelete.uniquePatientId) ||
+      ipdRecords.some(r => r.uniquePatientId === recordToDelete.uniquePatientId);
+
+    if (isRegisteredInOtherServices) {
+      alert('यो बिरामी अन्य सेवामा दर्ता वा भर्ना भइसकेको हुनाले हटाउन मिल्दैन।');
+      return;
+    }
+
     if (window.confirm('के तपाईं यो रेकर्ड हटाउन निश्चित हुनुहुन्छ?')) {
       onDeleteRecord(id);
     }

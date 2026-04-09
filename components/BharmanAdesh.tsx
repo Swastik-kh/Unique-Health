@@ -123,6 +123,15 @@ export const BharmanAdesh: React.FC<BharmanAdeshProps> = ({
 
   const entriesForYear = bharmanAdeshEntries.filter(e => e.fiscalYear === currentFiscalYear);
 
+  const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  const toNepaliDigits = (num: string | number) => {
+    if (!num) return '';
+    return num.toString().split('').map(digit => {
+      const d = parseInt(digit);
+      return isNaN(d) ? digit : nepaliDigits[d];
+    }).join('');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -407,12 +416,12 @@ export const BharmanAdesh: React.FC<BharmanAdeshProps> = ({
 
                 <div className="flex justify-between mb-4">
                   <div className="space-y-0.5">
-                    <div>संख्या : {selectedEntry.sankhya}</div>
-                    <div>च.नं. : {selectedEntry.chalaniNo}</div>
-                    <div>क.स.नं. : {selectedEntry.ksNo}</div>
+                    <div>संख्या : {toNepaliDigits(selectedEntry.sankhya)}</div>
+                    <div>च.नं. : {toNepaliDigits(selectedEntry.chalaniNo)}</div>
+                    <div>क.स.नं. : {toNepaliDigits(selectedEntry.ksNo)}</div>
                   </div>
                   <div className="text-right">
-                    <div>मिति : {selectedEntry.date}</div>
+                    <div>मिति : {toNepaliDigits(selectedEntry.date)}</div>
                   </div>
                 </div>
 
@@ -422,14 +431,14 @@ export const BharmanAdesh: React.FC<BharmanAdeshProps> = ({
                   <div className="flex"><span className="w-6 shrink-0">३.</span><span>कार्यालय :- {selectedEntry.office} ।</span></div>
                   <div className="flex"><span className="w-6 shrink-0">४.</span><span>भ्रमण गर्ने स्थान :- {selectedEntry.destination} ।</span></div>
                   <div className="flex"><span className="w-6 shrink-0">५.</span><span>भ्रमणको उद्देश्य :- {selectedEntry.purpose} ।</span></div>
-                  <div className="flex"><span className="w-6 shrink-0">६.</span><span>भ्रमण गर्ने अवधि :- मिति {selectedEntry.fromDate} गते देखि {selectedEntry.toDate} गते सम्म ।</span></div>
+                  <div className="flex"><span className="w-6 shrink-0">६.</span><span>भ्रमण गर्ने अवधि :- मिति {toNepaliDigits(selectedEntry.fromDate)} गते देखि {toNepaliDigits(selectedEntry.toDate)} गते सम्म ।</span></div>
                   <div className="flex"><span className="w-6 shrink-0">७.</span><span>भ्रमण गर्ने साधन :- {selectedEntry.transportMeans} ।</span></div>
                   <div className="flex"><span className="w-6 shrink-0">८.</span><span>भ्रमणको निमित्त माग गरेको पेश्की खर्च :-</span></div>
                   
                   <div className="pl-8 space-y-0.5">
-                    <div>भ्रमणभत्ता : {selectedEntry.travelAllowance || '-'}</div>
-                    <div>दैनिकभत्ता : {selectedEntry.dailyAllowance || '-'}</div>
-                    <div>फुटकर खर्च : {selectedEntry.miscExpense || '-'}</div>
+                    <div>भ्रमणभत्ता : {toNepaliDigits(selectedEntry.travelAllowance) || '-'}</div>
+                    <div>दैनिकभत्ता : {toNepaliDigits(selectedEntry.dailyAllowance) || '-'}</div>
+                    <div>फुटकर खर्च : {toNepaliDigits(selectedEntry.miscExpense) || '-'}</div>
                   </div>
 
                   <div className="flex"><span className="w-6 shrink-0">९.</span><span>भ्रमण सम्बन्धि अन्य आदेश : {selectedEntry.otherOrders || '-'}</span></div>

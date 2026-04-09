@@ -130,6 +130,7 @@ interface ExtendedDashboardProps extends DashboardProps {
   ipdRecords: IPDRecord[];
   onSaveIPDRecord: (record: IPDRecord) => void;
   onDeleteIPDRecord: (id: string) => void;
+  onDeleteAllIPDRecords: () => void;
   interFacilityRequests: InterFacilityRequest[];
   onAddInterFacilityRequest: (req: InterFacilityRequest) => void;
   onUpdateInterFacilityRequest: (req: InterFacilityRequest) => void;
@@ -185,7 +186,7 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
   ecgRecords = [], onSaveECGRecord, onDeleteECGRecord,
   usgRecords = [], onSaveUSGRecord, onDeleteUSGRecord,
   physiotherapyRecords = [], onSavePhysiotherapyRecord, onDeletePhysiotherapyRecord,
-  ipdRecords = [], onSaveIPDRecord, onDeleteIPDRecord,
+  ipdRecords = [], onSaveIPDRecord, onDeleteIPDRecord, onDeleteAllIPDRecords,
   interFacilityRequests = [], onAddInterFacilityRequest, onUpdateInterFacilityRequest,
   onUpdateReadNotifications,
   activeOrgName, onSetActiveOrgName, allUsers = []
@@ -1091,6 +1092,10 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
       />;
       case 'mul_darta': return <MulDartaSewa 
         records={serviceSeekerRecords}
+        opdRecords={opdRecords}
+        emergencyRecords={emergencyRecords}
+        cbimnciRecords={cbimnciRecords}
+        ipdRecords={ipdRecords}
         serviceItems={serviceItems}
         onSaveRecord={onSaveServiceSeekerRecord}
         onDeleteRecord={onDeleteServiceSeekerRecord}
@@ -1124,6 +1129,7 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
         ipdRecords={ipdRecords}
         onSaveRecord={onSaveIPDRecord}
         onDeleteRecord={onDeleteIPDRecord}
+        onDeleteAllRecords={onDeleteAllIPDRecords}
         currentFiscalYear={currentFiscalYear}
         currentUser={currentUser}
         generalSettings={generalSettings}
