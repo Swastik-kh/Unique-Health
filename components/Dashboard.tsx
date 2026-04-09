@@ -78,7 +78,7 @@ import { MedicineStatusReport } from './MedicineStatusReport';
 // @ts-ignore
 import NepaliDate from 'nepali-date-converter';
 
-import { BiometricSetupPrompt } from './BiometricSetupPrompt';
+
 
 interface ExtendedDashboardProps extends DashboardProps {
   onUploadData: (sectionId: string, data: any[], extraMeta?: any) => Promise<void>;
@@ -226,36 +226,6 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
   const [chalaniSearchQuery, setChalaniSearchQuery] = useState('');
   
   const [previewDakhila, setPreviewDakhila] = useState<DakhilaPratibedanEntry | null>(null);
-  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
-
-  useEffect(() => {
-    // Check if we should prompt for biometric setup
-    const shouldPrompt = () => {
-      if (!window.PublicKeyCredential) return false;
-      if (currentUser.biometricCredential) return false;
-      if (sessionStorage.getItem('biometric_prompt_dismissed')) return false;
-      
-      // Only prompt if they've logged in recently (e.g., first time this session)
-      return true;
-    };
-
-    if (shouldPrompt()) {
-      const timer = setTimeout(() => {
-        setShowBiometricPrompt(true);
-      }, 3000); // Show after 3 seconds of dashboard load
-      return () => clearTimeout(timer);
-    }
-  }, [currentUser]);
-
-  const handleSetupBiometric = () => {
-    setShowBiometricPrompt(false);
-    setActiveItem('change_password');
-  };
-
-  const handleDismissBiometric = () => {
-    setShowBiometricPrompt(false);
-    sessionStorage.setItem('biometric_prompt_dismissed', 'true');
-  };
   
   // New State for Dashboard Date Selection
   const [selectedStatsDate, setSelectedStatsDate] = useState<string>(() => {
@@ -1705,13 +1675,6 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
         <PrintOptionsModal 
           onClose={() => setShowExpiryPrintOptionsModal(false)} 
           onPrint={(orientation) => handlePrint(expiryModalType === 'expired' ? 'expired-items-print' : 'near-expiry-items-print', orientation)} 
-        />
-      )}
-
-      {showBiometricPrompt && (
-        <BiometricSetupPrompt 
-          onClose={handleDismissBiometric} 
-          onSetup={handleSetupBiometric} 
         />
       )}
     </div>
