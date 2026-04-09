@@ -68,6 +68,7 @@ import { XRaySewa } from './XRaySewa';
 import { ECGSewa } from './ECGSewa';
 import { USGSewa } from './USGSewa';
 import { PhysiotherapySewa } from './PhysiotherapySewa';
+import { TBDSTReport } from './TBDSTReport';
 import { FamilyPlanningReport } from './FamilyPlanningReport';
 import { GESIReport } from './GESIReport';
 import { GESIOPDReport } from './GESIOPDReport';
@@ -563,6 +564,7 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
         { id: 'report_gesi_opd', label: 'GESI OPD सेवा रिपोर्ट', icon: <FileText size={16} /> },
         { id: 'report_gesi_cbimnci', label: 'GESI CBIMNCI रिपोर्ट', icon: <FileText size={16} /> },
         { id: 'report_mch', label: 'MCH रिपोर्ट', icon: <Baby size={16} /> },
+        { id: 'report_tb_dst', label: 'TBDST रिपोर्ट', icon: <FileText size={16} /> },
         { id: 'report_inventory_monthly', label: 'जिन्सी मासिक रिपोर्ट', icon: <FileText size={16} /> },
       ]
     },
@@ -1268,6 +1270,7 @@ export const Dashboard: React.FC<ExtendedDashboardProps> = ({
                                       currentFiscalYear={currentFiscalYear}
                                     />;
       case 'log_book': return <LogBook currentUser={currentUser} currentFiscalYear={currentFiscalYear} inventoryItems={inventoryItems} logBookEntries={logBookEntries} onAddLogEntry={onSaveLogBookEntry} />;
+      case 'report_tb_dst': return <TBDSTReport patients={tbPatients} currentFiscalYear={currentFiscalYear} />;
       case 'report_inventory_monthly': return <InventoryMonthlyReport 
                                               currentFiscalYear={currentFiscalYear} 
                                               currentUser={currentUser} 
