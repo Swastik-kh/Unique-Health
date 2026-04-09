@@ -17,7 +17,14 @@ const PERMISSION_STRUCTURE = [
             { id: 'service_billing', label: 'सेवा बिलिङ (Service Billing)' },
             { id: 'emergency_sewa', label: 'आकस्मिक सेवा (Emergency Service)' },
             { id: 'cbimnci_sewa', label: 'CBIMNCI सेवा (CBIMNCI Service)' },
-            { id: 'prayogsala_sewa', label: 'प्रयोगशाला सेवा (Lab Service)' },
+            { 
+                id: 'prayogsala_sewa', 
+                label: 'प्रयोगशाला सेवा (Lab Service)',
+                children: [
+                    { id: 'namuna_sankalan', label: 'नमुना संकलन (Sample Collection)' },
+                    { id: 'report_prabisti', label: 'रिपोर्ट प्रविष्टि (Result Entry)' },
+                ]
+            },
             { id: 'dispensory_sewa', label: 'डिस्पेन्सरी सेवा (Dispensary Service)' },
             { id: 'pariwar_niyojan', label: 'परिवार नियोजन सेवा (Family Planning)' },
             { id: 'xray_sewa', label: 'एक्स-रे सेवा (X-ray Service)' },

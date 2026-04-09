@@ -40,6 +40,7 @@ export const PrayogsalaSewa: React.FC<PrayogsalaSewaProps> = ({
   const [currentBarcodeReport, setCurrentBarcodeReport] = useState<LabReport | null>(null);
   const [activeTab, setActiveTab] = useState<'sample' | 'result'>('sample');
   const [viewMode, setViewMode] = useState<'search' | 'dashboard'>('dashboard');
+  const [activeSubMenu, setActiveSubMenu] = useState<'collection' | 'entry'>('collection');
   
   const printRef = useRef<HTMLDivElement>(null);
   const barcodePrintRef = useRef<HTMLDivElement>(null);
@@ -394,10 +395,16 @@ export const PrayogsalaSewa: React.FC<PrayogsalaSewaProps> = ({
           </h2>
           <div className="flex bg-slate-100 p-1 rounded-lg">
             <button 
-              onClick={() => setViewMode('dashboard')}
-              className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'dashboard' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              onClick={() => { setViewMode('dashboard'); setActiveSubMenu('collection'); }}
+              className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'dashboard' && activeSubMenu === 'collection' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
-              Dashboard
+              नमुना संकलन
+            </button>
+            <button 
+              onClick={() => { setViewMode('dashboard'); setActiveSubMenu('entry'); }}
+              className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'dashboard' && activeSubMenu === 'entry' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              रिपोर्ट प्रविष्टि
             </button>
             <button 
               onClick={() => setViewMode('search')}
@@ -558,138 +565,46 @@ export const PrayogsalaSewa: React.FC<PrayogsalaSewaProps> = ({
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="flex border-b">
                 <button 
-                  onClick={() => setActiveTab('sample')}
-                  className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors ${activeTab === 'sample' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600' : 'text-slate-500 hover:bg-slate-50'}`}
+                  onClick={() => setActiveSubMenu('collection')}
+                  className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors ${activeSubMenu === 'collection' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600' : 'text-slate-500 hover:bg-slate-50'}`}
                 >
                   <Beaker size={18} /> नमुना संकलन (Sample Collection)
-                  {pendingTests.filter(t => !t.sampleCollected).length > 0 && (
-                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
-                      {pendingTests.filter(t => !t.sampleCollected).length}
-                    </span>
-                  )}
                 </button>
                 <button 
-                  onClick={() => setActiveTab('result')}
-                  className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors ${activeTab === 'result' ? 'bg-green-50 text-green-700 border-b-2 border-green-600' : 'text-slate-500 hover:bg-slate-50'}`}
+                  onClick={() => setActiveSubMenu('entry')}
+                  className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors ${activeSubMenu === 'entry' ? 'bg-green-50 text-green-700 border-b-2 border-green-600' : 'text-slate-500 hover:bg-slate-50'}`}
                 >
                   <Activity size={18} /> रिपोर्ट प्रविष्टि (Result Entry)
-                  {pendingTests.filter(t => t.sampleCollected && !t.result).length > 0 && (
-                    <span className="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full">
-                      {pendingTests.filter(t => t.sampleCollected && !t.result).length}
-                    </span>
-                  )}
                 </button>
               </div>
 
               <div className="p-6">
-                {Object.keys(groupedPendingTests).length > 0 ? (
+                {activeSubMenu === 'collection' ? (
                   <div className="space-y-8">
-                    {(Object.entries(groupedPendingTests) as [string, PendingTest[]][]).map(([invoiceNumber, tests]) => (
-                      <div key={invoiceNumber} className="space-y-4 border-l-4 border-primary-500 pl-4 py-2">
-                        <div className="flex justify-between items-center">
+                    {/* Sample Collection Content */}
+                    {Object.keys(groupedPendingTests).length > 0 ? (
+                      (Object.entries(groupedPendingTests) as [string, PendingTest[]][]).map(([invoiceNumber, tests]) => (
+                        <div key={invoiceNumber} className="space-y-4 border-l-4 border-primary-500 pl-4 py-2">
                           <h4 className="font-bold text-slate-700 flex items-center gap-2">
                             <FileText size={16} className="text-primary-600" />
                             Invoice: {invoiceNumber}
                           </h4>
-                          {activeTab === 'sample' ? (
-                            <div className="flex items-center gap-2">
-                              {tests.some(t => t.sampleCollected) && (
-                                <button 
-                                  onClick={() => {
-                                    const report = labReports.find(r => r.invoiceNumber === invoiceNumber && r.serviceSeekerId === currentPatient?.id);
-                                    if (report) {
-                                      setCurrentBarcodeReport(report);
-                                      setTimeout(() => {
-                                        if (barcodePrintRef.current) handlePrintBarcode();
-                                      }, 300);
-                                    }
-                                  }}
-                                  className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-200 text-xs font-bold shadow-sm flex items-center gap-2"
-                                  title="Print Invoice Barcode"
-                                >
-                                  <Printer size={14} /> Print Invoice Barcode
-                                </button>
-                              )}
-                              {tests.some(t => !t.sampleCollected) && (
-                                <button 
-                                  onClick={() => handleCollectInvoiceSamples(invoiceNumber)}
-                                  className="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 text-xs font-bold shadow-sm flex items-center gap-2"
-                                >
-                                  <Beaker size={14} /> Collect All
-                                </button>
-                              )}
-                              <div className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-                                {tests.filter(t => !t.sampleCollected).length} Pending Samples
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              {tests.filter(t => t.sampleCollected && !t.result).length > 0 && (
-                                <div className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
-                                  {tests.filter(t => t.sampleCollected && !t.result).length} Pending Results
-                                </div>
-                              )}
-                              {tests.some(t => t.sampleCollected) && (
-                                <div className="flex items-center gap-2">
-                                  <button 
-                                    onClick={() => {
-                                      const report = labReports.find(r => r.invoiceNumber === invoiceNumber && r.serviceSeekerId === currentPatient?.id);
-                                      if (report) {
-                                        setCurrentBarcodeReport(report);
-                                        setTimeout(() => {
-                                          if (barcodePrintRef.current) handlePrintBarcode();
-                                        }, 300);
-                                      }
-                                    }}
-                                    className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-200 text-xs font-bold shadow-sm flex items-center gap-2"
-                                    title="Print Invoice Barcode"
-                                  >
-                                    <Printer size={14} /> Barcode
-                                  </button>
-                                  <button 
-                                    onClick={() => handleSaveReport(invoiceNumber)}
-                                    className="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 text-xs font-bold shadow-sm flex items-center gap-2"
-                                  >
-                                    <Save size={14} /> Save & Print
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="border rounded-lg overflow-hidden">
-                          <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-slate-600 font-bold">
-                              {activeTab === 'sample' ? (
+                          <div className="border rounded-lg overflow-hidden">
+                            <table className="w-full text-sm text-left">
+                              <thead className="bg-slate-50 text-slate-600 font-bold">
                                 <tr>
                                   <th className="p-3">Test Name</th>
                                   <th className="p-3">Invoice</th>
                                   <th className="p-3">Barcode ID</th>
                                   <th className="p-3 text-center">Action</th>
                                 </tr>
-                              ) : (
-                                <tr>
-                                  <th className="p-3 w-1/5">Test Name</th>
-                                  <th className="p-3 w-1/5">Result</th>
-                                  <th className="p-3 w-1/6">Unit</th>
-                                  <th className="p-3 w-1/6">Normal Range</th>
-                                  <th className="p-3 w-1/6">Remarks</th>
-                                  <th className="p-3 w-1/12 text-center">Barcode</th>
-                                </tr>
-                              )}
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {activeTab === 'sample' ? (
-                                tests.map((test) => (
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {tests.map((test) => (
                                   <tr key={test.id} className="hover:bg-slate-50">
                                     <td className="p-3 font-medium">{test.testName}</td>
-                                    <td className="p-3 text-xs text-slate-500">
-                                      {test.invoiceNumber}
-                                    </td>
-                                    <td className="p-3 text-xs font-mono text-slate-600">
-                                      {test.barcodeId || '-'}
-                                    </td>
+                                    <td className="p-3 text-xs text-slate-500">{test.invoiceNumber}</td>
+                                    <td className="p-3 text-xs font-mono text-slate-600">{test.barcodeId || '-'}</td>
                                     <td className="p-3 text-center">
                                       {!test.sampleCollected ? (
                                         <button 
@@ -699,97 +614,66 @@ export const PrayogsalaSewa: React.FC<PrayogsalaSewaProps> = ({
                                           Collect
                                         </button>
                                       ) : (
-                                        <div className="flex items-center justify-center gap-2">
-                                          <span className="text-green-600 flex items-center gap-1 text-xs font-bold">
-                                            <CheckCircle2 size={14} /> Collected
-                                          </span>
-                                          <button 
-                                            onClick={() => {
-                                              const report = labReports.find(r => r.invoiceNumber === test.invoiceNumber && r.serviceSeekerId === currentPatient?.id);
-                                              if (report) {
-                                                setCurrentBarcodeReport(report);
-                                                setTimeout(() => {
-                                                  if (barcodePrintRef.current) handlePrintBarcode();
-                                                }, 300);
-                                              }
-                                            }}
-                                            className="text-primary-600 hover:text-primary-700 p-1 rounded hover:bg-primary-50"
-                                            title="Print Barcode"
-                                          >
-                                            <Printer size={14} />
-                                          </button>
-                                        </div>
+                                        <span className="text-green-600 flex items-center gap-1 text-xs font-bold justify-center">
+                                          <CheckCircle2 size={14} /> Collected
+                                        </span>
                                       )}
                                     </td>
                                   </tr>
-                                ))
-                              ) : (
-                                tests.filter(t => t.sampleCollected).map((test) => (
-                                  <tr key={test.id} className="hover:bg-slate-50">
-                                    <td className="p-3 font-medium">{test.testName}</td>
-                                    <td className="p-3">
-                                      <input 
-                                        type="text" 
-                                        value={test.result}
-                                        onChange={(e) => handleResultChange(test.id, 'result', e.target.value)}
-                                        className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="Result"
-                                      />
-                                    </td>
-                                    <td className="p-3">
-                                      <input 
-                                        type="text" 
-                                        value={test.unit}
-                                        onChange={(e) => handleResultChange(test.id, 'unit', e.target.value)}
-                                        className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="Unit"
-                                      />
-                                    </td>
-                                    <td className="p-3 text-slate-500 text-xs">
-                                      {test.normalRange}
-                                    </td>
-                                    <td className="p-3">
-                                      <input 
-                                        type="text" 
-                                        value={test.remarks}
-                                        onChange={(e) => handleResultChange(test.id, 'remarks', e.target.value)}
-                                        className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-                                        placeholder="Remarks"
-                                      />
-                                    </td>
-                                    <td className="p-3 text-center">
-                                      <span className="text-xs font-mono text-slate-400">
-                                        {test.barcodeId}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                              {activeTab === 'sample' && tests.length === 0 && (
-                                <tr>
-                                  <td colSpan={4} className="p-8 text-center text-slate-400 italic">
-                                    कुनै परीक्षण भेटिएन।
-                                  </td>
-                                </tr>
-                              )}
-                              {activeTab === 'result' && tests.filter(t => t.sampleCollected).length === 0 && (
-                                <tr>
-                                  <td colSpan={6} className="p-8 text-center text-slate-400 italic">
-                                    कृपया पहिला नमुना संकलन (Sample Collection) गर्नुहोस्।
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-center py-8 text-slate-400 italic text-sm">कुनै नमुना संकलन बाँकी छैन।</p>
+                    )}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-                    <Activity className="mx-auto h-12 w-12 text-slate-300 mb-3" />
-                    <p className="text-slate-500">यो बिरामीको लागि कुनै ल्याब बिल भेटिएन।</p>
-                    <p className="text-xs text-slate-400 mt-1">कृपया पहिला सेवा बिलिङ (Service Billing) मा ल्याब टेस्टको बिल काट्नुहोस्।</p>
+                  <div className="space-y-8">
+                    {/* Result Entry Content */}
+                    {Object.keys(groupedPendingTests).length > 0 ? (
+                      (Object.entries(groupedPendingTests) as [string, PendingTest[]][]).map(([invoiceNumber, tests]) => (
+                        <div key={invoiceNumber} className="space-y-4 border-l-4 border-green-500 pl-4 py-2">
+                          <h4 className="font-bold text-slate-700 flex items-center gap-2">
+                            <FileText size={16} className="text-green-600" />
+                            Invoice: {invoiceNumber}
+                          </h4>
+                          <div className="border rounded-lg overflow-hidden">
+                            <table className="w-full text-sm text-left">
+                              <thead className="bg-slate-50 text-slate-600 font-bold">
+                                <tr>
+                                  <th className="p-3">Test Name</th>
+                                  <th className="p-3">Result</th>
+                                  <th className="p-3">Unit</th>
+                                  <th className="p-3">Normal Range</th>
+                                  <th className="p-3">Remarks</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {tests.filter(t => t.sampleCollected).map((test) => (
+                                  <tr key={test.id} className="hover:bg-slate-50">
+                                    <td className="p-3 font-medium">{test.testName}</td>
+                                    <td className="p-3"><input type="text" value={test.result} onChange={(e) => handleResultChange(test.id, 'result', e.target.value)} className="w-full p-2 border rounded" placeholder="Result" /></td>
+                                    <td className="p-3"><input type="text" value={test.unit} onChange={(e) => handleResultChange(test.id, 'unit', e.target.value)} className="w-full p-2 border rounded" placeholder="Unit" /></td>
+                                    <td className="p-3 text-slate-500 text-xs">{test.normalRange}</td>
+                                    <td className="p-3"><input type="text" value={test.remarks} onChange={(e) => handleResultChange(test.id, 'remarks', e.target.value)} className="w-full p-2 border rounded" placeholder="Remarks" /></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <div className="flex justify-end">
+                            <button onClick={() => handleSaveReport(invoiceNumber)} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-bold shadow-sm flex items-center gap-2">
+                              <Save size={16} /> Save Report
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center py-8 text-slate-400 italic text-sm">कुनै नतिजा प्रविष्टि बाँकी छैन।</p>
+                    )}
                   </div>
                 )}
               </div>
