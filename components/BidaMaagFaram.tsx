@@ -29,6 +29,15 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
   generalSettings
 }) => {
   
+  const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  const toNepaliDigits = (num: string | number) => {
+    if (num === undefined || num === null || num === '') return '';
+    return num.toString().split('').map(digit => {
+      const d = parseInt(digit);
+      return isNaN(d) ? digit : nepaliDigits[d];
+    }).join('');
+  };
+
   const leaveTypes = [
     { id: 'casual_festival', label: 'भैपरी आउने र पर्व बिदा', key: 'casual_festival' },
     { id: 'home', label: 'घर बिदा', key: 'home' },
@@ -141,7 +150,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
                 {selected ? '✓' : ''}
               </div>
               <div className="col-span-4 p-1 border-r border-black text-left pl-2 flex items-center">
-                {index + 1}. {type.label}
+                {toNepaliDigits(index + 1)}. {type.label}
               </div>
               {/* Merge cells for Duration and Reason for the first row, or repeat empty for others? 
                   The image shows empty rows. We'll fill the first selected row or just the first row if we want to mimic the form exactly.
@@ -149,7 +158,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
                   We'll put the data in the row corresponding to the selected leave type.
               */}
               <div className="col-span-3 p-1 border-r border-black flex items-center justify-center">
-                {selected ? `${duration} दिन` : ''}
+                {selected ? `${toNepaliDigits(duration)} दिन` : ''}
               </div>
               <div className="col-span-4 p-1 flex items-center justify-center text-left text-xs">
                 {selected ? application.reason : ''}
@@ -166,14 +175,14 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
 
         <div className="grid grid-cols-2">
            <div className="p-2 border-r border-black">
-             <span className="font-bold">बिदाको मिति:</span> {application.appliedDate}
+             <span className="font-bold">बिदाको मिति:</span> {toNepaliDigits(application.appliedDate)}
            </div>
            <div className="grid grid-cols-2">
              <div className="p-2 border-r border-black">
-               <span className="font-bold">देखि:</span> {application.startDate}
+               <span className="font-bold">देखि:</span> {toNepaliDigits(application.startDate)}
              </div>
              <div className="p-2">
-               <span className="font-bold">सम्म:</span> {application.endDate}
+               <span className="font-bold">सम्म:</span> {toNepaliDigits(application.endDate)}
              </div>
            </div>
         </div>
@@ -225,11 +234,11 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
            return (
             <div key={type.id} className="grid grid-cols-4 border-b border-black text-center text-xs">
               <div className="p-1 border-r border-black text-left pl-2">
-                {index + 1}. {type.label}
+                {toNepaliDigits(index + 1)}. {type.label}
               </div>
-              <div className="p-1 border-r border-black">{previousBalance}</div>
-              <div className="p-1 border-r border-black">{selected ? duration : ''}</div>
-              <div className="p-1">{remainingBalance}</div>
+              <div className="p-1 border-r border-black">{toNepaliDigits(previousBalance)}</div>
+              <div className="p-1 border-r border-black">{selected ? toNepaliDigits(duration) : ''}</div>
+              <div className="p-1">{toNepaliDigits(remainingBalance)}</div>
             </div>
            );
         })}
@@ -253,7 +262,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
              </label>
           </div>
           <div className="mb-8">
-            बिदा सकिने मिति: {application.endDate}
+            बिदा सकिने मिति: {toNepaliDigits(application.endDate)}
           </div>
           <div className="border-t border-dotted border-black w-2/3 pt-1 text-center">
             निकटतम माथिल्लो अधिकृत
@@ -273,7 +282,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
           </div>
           <div className="mb-8">
             {application.status !== 'Rejected' && (
-              <>बिदा सकिने मिति: {application.endDate}</>
+              <>बिदा सकिने मिति: {toNepaliDigits(application.endDate)}</>
             )}
           </div>
           <div className="border-t border-dotted border-black w-2/3 pt-1 text-center">
@@ -282,7 +291,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
           <div className="mt-2 grid grid-cols-1 gap-1">
             <div className="font-bold">{application.approvedBy || ''}</div>
             <div>पद: {application.approverDesignation || ''}</div>
-            <div>मिति: {application.approvalDate || ''}</div>
+            <div>मिति: {toNepaliDigits(application.approvalDate || '')}</div>
           </div>
         </div>
       </div>
@@ -300,7 +309,7 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
         
         <div className="flex justify-between mb-2">
           <span>प.स.</span>
-          <span>मिति: {application.approvalDate || new NepaliDate().format('YYYY-MM-DD')}</span>
+          <span>मिति: {toNepaliDigits(application.approvalDate || new NepaliDate().format('YYYY-MM-DD'))}</span>
         </div>
         <div className="mb-2">
           श्री {application.employeeName}
@@ -315,9 +324,9 @@ export const BidaMaagFaram: React.FC<BidaMaagFaramProps> = ({
           </div>
           <div className="grid grid-cols-4 text-center text-xs">
             <div className="p-1 border-r border-black">{application.status === 'Rejected' ? '' : getNepaliLeaveType(application.leaveType)}</div>
-            <div className="p-1 border-r border-black">{application.status === 'Rejected' ? '' : `${duration} दिन`}</div>
-            <div className="p-1 border-r border-black">{application.status === 'Rejected' ? '' : application.startDate}</div>
-            <div className="p-1">{application.status === 'Rejected' ? '' : reportingDate}</div>
+            <div className="p-1 border-r border-black">{application.status === 'Rejected' ? '' : `${toNepaliDigits(duration)} दिन`}</div>
+            <div className="p-1 border-r border-black">{application.status === 'Rejected' ? '' : toNepaliDigits(application.startDate)}</div>
+            <div className="p-1">{application.status === 'Rejected' ? '' : toNepaliDigits(reportingDate)}</div>
           </div>
         </div>
 
