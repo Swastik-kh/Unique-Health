@@ -138,6 +138,33 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
     pptx.writeFile({ fileName: `TBDST_Report_${new Date().toISOString().slice(0, 10)}.pptx` });
   };
 
+  const getMappedEthnicity = (e: string | undefined) => {
+    const val = e || 'Unknown';
+    if (val === '1') return 'Dalit';
+    // Normalize casing for ordering
+    if (val.toLowerCase() === 'dalit') return 'Dalit';
+    if (val.toLowerCase() === 'janjati') return 'Janajati';
+    if (val.toLowerCase() === 'madheshi') return 'Madhesi';
+    if (val.toLowerCase() === 'muslim') return 'Muslim';
+    if (val.toLowerCase() === 'brahmin/chhetri') return 'Brahmin/Chhetri';
+    if (val.toLowerCase() === 'others') return 'Others';
+    return val;
+  };
+
+  const uniqueEthnicities = useMemo(() => {
+    const ethnicities = new Set(filteredPatients.map(p => getMappedEthnicity(p.ethnicity)));
+    const order = ['Dalit', 'Janajati', 'Madhesi', 'Muslim', 'Brahmin/Chhetri', 'Others'];
+    
+    return Array.from(ethnicities as Set<string>).sort((a: string, b: string) => {
+        const indexA = order.indexOf(a);
+        const indexB = order.indexOf(b);
+        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+  }, [filteredPatients]);
+
   return (
     <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-200">
       <style type="text/css" media="print">
@@ -549,6 +576,32 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 <td className="border border-slate-300 p-2 text-center">0</td>
                 <td className="border border-slate-300 p-2 text-center">0</td>
               </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Jatigat Report */}
+        <div className="overflow-x-auto">
+          <h3 className="font-bold mb-2">Jatigat Report (Caste-based)</h3>
+          <table className="w-full text-sm border-collapse border border-slate-300">
+            <thead className="bg-slate-100">
+              <tr>
+                <th className="border p-2" rowSpan={2}>Caste</th>
+                <th className="border p-2" colSpan={2}>Total</th>
+              </tr>
+              <tr>
+                <th className="border p-1">Male</th>
+                <th className="border p-1">Female</th>
+              </tr>
+            </thead>
+            <tbody>
+              {uniqueEthnicities.map(ethnicity => (
+                <tr key={ethnicity}>
+                  <td className="border border-slate-300 p-2 font-medium">{ethnicity}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => getMappedEthnicity(p.ethnicity) === ethnicity && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => getMappedEthnicity(p.ethnicity) === ethnicity && p.gender === 'Female')}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
