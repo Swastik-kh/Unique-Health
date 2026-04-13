@@ -184,11 +184,18 @@ export const NepaliDatePicker: React.FC<NepaliDatePickerProps> = ({
     }
   };
 
+  const toNepaliNumerals = (str: string) => {
+    const nepaliDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+    return str.replace(/[0-9]/g, (d) => nepaliDigits[parseInt(d)]);
+  };
+
   const formatDateString = (year: number, month: number, day: number) => {
       const m = String(month + 1).padStart(2, '0');
       const d = String(day).padStart(2, '0');
       return format === 'YYYY/MM/DD' ? `${year}/${m}/${d}` : `${year}-${m}-${d}`;
   };
+
+  const displayValue = value ? toNepaliNumerals(value) : '';
 
   const handlePrevMonth = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -367,7 +374,7 @@ export const NepaliDatePicker: React.FC<NepaliDatePickerProps> = ({
         <input
           type="text"
           readOnly
-          value={value || ''}
+          value={displayValue || ''}
           placeholder={format}
           disabled={disabled}
           className={`
