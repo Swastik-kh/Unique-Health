@@ -783,32 +783,6 @@ export const TBPatientRegistration: React.FC<TBPatientRegistrationProps> = ({
   const handleToggleDailyDose = (date: string) => {
     if (!selectedPatientForTreatmentCard) return;
     
-    const startDateStr = selectedPatientForTreatmentCard.treatmentStartDate || selectedPatientForTreatmentCard.registrationDate;
-    if (startDateStr) {
-      const parts = startDateStr.split('-');
-      const startYear = parseInt(parts[0]);
-      const startMonth = parseInt(parts[1]) - 1;
-      const startDay = parseInt(parts[2]);
-      const startAdDate = new NepaliDate(startYear, startMonth, startDay).toJsDate();
-
-      const currentDoseParts = date.split('-');
-      const currentDoseNep = new NepaliDate(parseInt(currentDoseParts[0]), parseInt(currentDoseParts[1]) - 1, parseInt(currentDoseParts[2]));
-      const currentAdDate = currentDoseNep.toJsDate();
-
-      const diffTime = currentAdDate.getTime() - startAdDate.getTime();
-      const daysFromStart = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-      const is6HRZE = selectedPatientForTreatmentCard.treatmentType?.includes('6HRZE');
-      const intensiveDays = (is6HRZE ? 180 : 60) + (selectedPatientForTreatmentCard.intensivePhaseExtensionDays || 0);
-      const continuationDays = is6HRZE ? 0 : (120 + (selectedPatientForTreatmentCard.continuationPhaseExtensionDays || 0));
-      const totalDays = intensiveDays + continuationDays;
-
-      if (daysFromStart > totalDays) {
-          alert("उपचार अवधि सकिएको छ। यो दिन थप्न मिल्दैन।");
-          return;
-      }
-    }
-
     const currentDoses = selectedPatientForTreatmentCard.dailyDoses || [];
     let newDoses: string[];
     
