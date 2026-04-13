@@ -219,9 +219,11 @@ export const TBPatientRegistration: React.FC<TBPatientRegistrationProps> = ({
   const regTypes: Option[] = [
     { id: 'new', label: 'नयाँ (New)', value: 'New' },
     { id: 'relapse', label: 'दोहोरिएको (Relapse)', value: 'Relapse' },
+    { id: 'taf', label: 'उपचार असफल पछि (TAF)', value: 'TAF' },
+    { id: 'talf', label: 'उपचार पछि हराएको (TALF)', value: 'TALF' },
+    { id: 'opt', label: 'अन्य पहिले उपचार गरिएको (OPT)', value: 'OPT' },
+    { id: 'upth', label: 'अज्ञात उपचार इतिहास (UPTH)', value: 'UPTH' },
     { id: 'transfer_in', label: 'सरुवा भई आएको (Transferred In)', value: 'Transferred In' },
-    { id: 'loss_to_followup', label: 'उपचार पछि हराएको (Treatment after Loss to Follow-up)', value: 'Treatment after Loss to Follow-up' },
-    { id: 'other_previously_treated', label: 'अन्य पहिले उपचार गरिएको (Other previously treated)', value: 'Other previously treated' },
   ];
 
   const treatmentTypeOptions: Option[] = [

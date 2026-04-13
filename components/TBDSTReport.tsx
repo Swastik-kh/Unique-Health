@@ -105,7 +105,10 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
     slide1.addText('Case Registration [1]', { x: 0.5, y: 0.2, fontSize: 20, bold: true });
     const data1 = [
       { name: 'New', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'New'), count(p => p.classification === 'PCD' && p.regType === 'New'), count(p => p.classification === 'EP' && p.regType === 'New')] },
-      { name: 'Relapse', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'Relapse'), count(p => p.classification === 'PCD' && p.regType === 'Relapse'), count(p => p.classification === 'EP' && p.regType === 'Relapse')] }
+      { name: 'Relapse', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'Relapse'), count(p => p.classification === 'PCD' && p.regType === 'Relapse'), count(p => p.classification === 'EP' && p.regType === 'Relapse')] },
+      { name: 'TAF', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'TAF'), count(p => p.classification === 'PCD' && p.regType === 'TAF'), count(p => p.classification === 'EP' && p.regType === 'TAF')] },
+      { name: 'TALF', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'TALF'), count(p => p.classification === 'PCD' && p.regType === 'TALF'), count(p => p.classification === 'EP' && p.regType === 'TALF')] },
+      { name: 'OPT', labels: ['PBC', 'PCD', 'EP'], values: [count(p => p.classification === 'PBC' && p.regType === 'OPT'), count(p => p.classification === 'PCD' && p.regType === 'OPT'), count(p => p.classification === 'EP' && p.regType === 'OPT')] }
     ];
     slide1.addChart(pptx.ChartType.bar, data1, { x: 0.5, y: 0.8, w: '90%', h: '70%' });
 
@@ -135,6 +138,17 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-200">
+      <style type="text/css" media="print">
+        {`
+          @page { size: landscape; margin: 10mm; }
+          body { font-family: 'Kalimati', sans-serif; }
+          .overflow-x-auto { overflow: visible !important; }
+          table { width: 100%; border-collapse: collapse; font-size: 10px; }
+          th, td { border: 1px solid #000 !important; padding: 4px; text-align: center; }
+          th { background-color: #f3f4f6 !important; font-weight: bold; }
+          .print\\:hidden { display: none !important; }
+        `}
+      </style>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-slate-800 text-center flex-grow">११. क्षयरोग नियन्त्रण कार्यक्रम (Tuberculosis Control Program)</h2>
         <div className="flex gap-2 print:hidden">
@@ -252,7 +266,7 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 <th className="border p-2" colSpan={2}>UPTH</th>
               </tr>
               <tr>
-                {Array(6).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">F</th><th className="border p-1">M</th></React.Fragment>)}
+                {Array(6).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">M</th><th className="border p-1">F</th></React.Fragment>)}
               </tr>
             </thead>
             <tbody>
@@ -262,19 +276,19 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 { label: 'Extra Pulmonary (EP)', type: 'EP' }
               ].map(item => (
                 <tr key={item.type}>
-                  <td className="border p-2 font-medium">{item.label}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'New' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'New' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Relapse' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Relapse' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Treatment after Failure' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Treatment after Failure' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Treatment after Loss to Follow-up' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Treatment after Loss to Follow-up' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Other previously treated' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Other previously treated' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Unknown Previous TB treatment History' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Unknown Previous TB treatment History' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 font-medium">{item.label}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'New' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'New' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Relapse' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'Relapse' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'TAF' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'TAF' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'TALF' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'TALF' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'OPT' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'OPT' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'UPTH' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.classification === item.type && p.regType === 'UPTH' && p.gender === 'Female')}</td>
                 </tr>
               ))}
             </tbody>
@@ -291,7 +305,7 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 {[ '0-4 Yrs', '5-14 Yrs', '15-24 Yrs', '25-34 Yrs', '35-44 Yrs', '45-54 Yrs', '55-64 Yrs', '>= 65 Yrs'].map(age => <th key={age} className="border p-2" colSpan={2}>{age}</th>)}
               </tr>
               <tr>
-                {Array(8).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">F</th><th className="border p-1">M</th></React.Fragment>)}
+                {Array(8).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">M</th><th className="border p-1">F</th></React.Fragment>)}
               </tr>
             </thead>
             <tbody>
@@ -311,14 +325,14 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 };
                 return (
                   <tr key={cat.label}>
-                    <td className="border p-2 font-medium">{cat.label}</td>
+                    <td className="border border-slate-300 p-2 font-medium">{cat.label}</td>
                     {[
                       { min: 0, max: 4 }, { min: 5, max: 14 }, { min: 15, max: 24 }, { min: 25, max: 34 },
                       { min: 35, max: 44 }, { min: 45, max: 54 }, { min: 55, max: 64 }, { min: 65, max: 999 }
                     ].map(ageGroup => (
                       <React.Fragment key={ageGroup.min}>
-                        <td className="border p-2 text-center">{count(p => regCondition(p) && getAgeGroupCondition(ageGroup.min, ageGroup.max)(p) && p.gender === 'Female')}</td>
-                        <td className="border p-2 text-center">{count(p => regCondition(p) && getAgeGroupCondition(ageGroup.min, ageGroup.max)(p) && p.gender === 'Male')}</td>
+                        <td className="border border-slate-300 p-2 text-center">{count(p => regCondition(p) && getAgeGroupCondition(ageGroup.min, ageGroup.max)(p) && p.gender === 'Male')}</td>
+                        <td className="border border-slate-300 p-2 text-center">{count(p => regCondition(p) && getAgeGroupCondition(ageGroup.min, ageGroup.max)(p) && p.gender === 'Female')}</td>
                       </React.Fragment>
                     ))}
                   </tr>
@@ -344,11 +358,11 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
             <tbody>
               {['Pulmonary (PBC)', 'Pulmonary (PCD)', 'Extra Pulmonary (EP)'].map(type => (
                 <tr key={type}>
-                  <td className="border p-2 font-medium">{type}</td>
-                  <td className="border p-2 text-center">0</td>
-                  <td className="border p-2 text-center">0</td>
-                  <td className="border p-2 text-center">0</td>
-                  <td className="border p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 font-medium">{type}</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
                 </tr>
               ))}
             </tbody>
@@ -368,14 +382,14 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
             </thead>
             <tbody>
               <tr>
-                <td className="border p-2 font-medium">New</td>
-                <td className="border p-2 text-center">0</td>
-                <td className="border p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 font-medium">New</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
               </tr>
               <tr>
-                <td className="border p-2 font-medium">Re-treatment</td>
-                <td className="border p-2 text-center">0</td>
-                <td className="border p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 font-medium">Re-treatment</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
               </tr>
             </tbody>
           </table>
@@ -387,28 +401,28 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
           <table className="w-full text-sm border-collapse border border-slate-300">
             <thead className="bg-slate-100">
               <tr>
-                <th className="border p-2">Treatment Type (Upachar Prakar)</th>
+                <th className="border p-2" rowSpan={2}>Treatment Type (Upachar Prakar)</th>
                 <th className="border p-2" colSpan={2}>2HRZE+4HR</th>
                 <th className="border p-2" colSpan={2}>2HRZE+7HRE</th>
                 <th className="border p-2" colSpan={2}>6HRZE</th>
                 <th className="border p-2" colSpan={2}>6HRZE+Lfx</th>
               </tr>
               <tr>
-                {Array(4).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">F</th><th className="border p-1">M</th></React.Fragment>)}
+                {Array(4).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">M</th><th className="border p-1">F</th></React.Fragment>)}
               </tr>
             </thead>
             <tbody>
               {['New', 'Relapse', 'TAF', 'TALF', 'OPT', 'UPTH'].map(type => (
                 <tr key={type}>
-                  <td className="border p-2 font-medium">{type}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+4HR' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+4HR' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+7HRE' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+7HRE' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE+Lfx' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE+Lfx' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 font-medium">{type}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+4HR' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+4HR' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+7HRE' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '2HRZE+7HRE' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE+Lfx' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{count(p => p.regType === type && p.treatmentType === '6HRZE+Lfx' && p.gender === 'Female')}</td>
                 </tr>
               ))}
             </tbody>
@@ -432,11 +446,11 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
               <tbody>
                 {['Female', 'Male'].map(sex => (
                   <tr key={sex}>
-                    <td className="border p-2 font-medium">{sex}</td>
-                    <td className="border p-2 text-center">0</td>
-                    <td className="border p-2 text-center">0</td>
-                    <td className="border p-2 text-center">0</td>
-                    <td className="border p-2 text-center">0</td>
+                    <td className="border border-slate-300 p-2 font-medium">{sex}</td>
+                    <td className="border border-slate-300 p-2 text-center">0</td>
+                    <td className="border border-slate-300 p-2 text-center">0</td>
+                    <td className="border border-slate-300 p-2 text-center">0</td>
+                    <td className="border border-slate-300 p-2 text-center">0</td>
                   </tr>
                 ))}
               </tbody>
@@ -453,8 +467,8 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
               </thead>
               <tbody>
                 <tr>
-                  <td className="border p-2 text-center">0</td>
-                  <td className="border p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
+                  <td className="border border-slate-300 p-2 text-center">0</td>
                 </tr>
               </tbody>
             </table>
@@ -476,17 +490,17 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 <th className="border p-2" colSpan={2}>Not Evaluated</th>
               </tr>
               <tr>
-                {Array(6).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">F</th><th className="border p-1">M</th></React.Fragment>)}
+                {Array(6).fill(0).map((_, i) => <React.Fragment key={i}><th className="border p-1">M</th><th className="border p-1">F</th></React.Fragment>)}
               </tr>
             </thead>
             <tbody>
               {[
                 { label: 'PBC New', class: 'PBC', reg: 'New' },
                 { label: 'PBC Relapse', class: 'PBC', reg: 'Relapse' },
-                { label: 'PBC TAF', class: 'PBC', reg: 'Treatment after Failure' },
-                { label: 'PBC TALF', class: 'PBC', reg: 'Treatment after Loss to Follow-up' },
-                { label: 'PBC OPT', class: 'PBC', reg: 'Other previously treated' },
-                { label: 'PBC UPTH', class: 'PBC', reg: 'Unknown Previous TB treatment History' },
+                { label: 'PBC TAF', class: 'PBC', reg: 'TAF' },
+                { label: 'PBC TALF', class: 'PBC', reg: 'TALF' },
+                { label: 'PBC OPT', class: 'PBC', reg: 'OPT' },
+                { label: 'PBC UPTH', class: 'PBC', reg: 'UPTH' },
                 { label: 'PCD New', class: 'PCD', reg: 'New' },
                 { label: 'PCD Relapse', class: 'PCD', reg: 'Relapse' },
                 { label: 'PCD Other', class: 'PCD', reg: 'Other' },
@@ -495,19 +509,19 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
                 { label: 'EP Other', class: 'EP', reg: 'Other' },
               ].map(cat => (
                 <tr key={cat.label}>
-                  <td className="border p-2 font-medium">{cat.label}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Cured' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Cured' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Completed' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Completed' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Failed' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Failed' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Died' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Died' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Lost to follow up' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Lost to follow up' && p.gender === 'Male')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Not Evaluated' && p.gender === 'Female')}</td>
-                  <td className="border p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Not Evaluated' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 font-medium">{cat.label}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Cured' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Cured' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Completed' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Completed' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Failed' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Failed' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Died' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Died' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Lost to follow up' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Lost to follow up' && p.gender === 'Female')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Not Evaluated' && p.gender === 'Male')}</td>
+                  <td className="border border-slate-300 p-2 text-center">{outcomeCount(p => p.classification === cat.class && p.regType === cat.reg && getOutcome(p) === 'Not Evaluated' && p.gender === 'Female')}</td>
                 </tr>
               ))}
             </tbody>
@@ -528,10 +542,10 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
             </thead>
             <tbody>
               <tr>
-                <td className="border p-2 text-center">0</td>
-                <td className="border p-2 text-center">0</td>
-                <td className="border p-2 text-center">0</td>
-                <td className="border p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
+                <td className="border border-slate-300 p-2 text-center">0</td>
               </tr>
             </tbody>
           </table>
