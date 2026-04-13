@@ -1154,6 +1154,7 @@ export const TBPatientRegistration: React.FC<TBPatientRegistrationProps> = ({
                   <tr>
                       <th className="px-6 py-3">ID</th>
                       <th className="px-6 py-3">बिरामी विवरण</th>
+                      <th className="px-6 py-3">दर्ता प्रकार</th>
                       <th className="px-6 py-3">वर्गीकरण</th>
                       <th className="px-6 py-3">अवस्था</th>
                       <th className="px-6 py-3">रिपोर्टहरू</th>
@@ -1168,6 +1169,11 @@ export const TBPatientRegistration: React.FC<TBPatientRegistrationProps> = ({
                           <td className="px-6 py-4 cursor-pointer hover:bg-slate-100" onClick={() => setSelectedPatientForDetails(p)}>
                               <div className="font-bold text-slate-800">{p.name}</div>
                               <div className="text-[10px] text-slate-400">{p.age} Yrs | {p.address} | {p.phone}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black border bg-slate-50 text-slate-700 border-slate-200">
+                                  {regTypes.find(r => r.value === p.regType)?.label || p.regType}
+                              </span>
                           </td>
                           <td className="px-6 py-4">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-black border ${activeTab === 'TB' ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'}`}>

@@ -28,7 +28,8 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
   const filteredPatients = useMemo(() => {
     if (!patients) return [];
     return patients.filter(p => {
-      const recordDate = new NepaliDate(p.registrationDate);
+      const parts = p.registrationDate.split(/[-/]/);
+      const recordDate = new NepaliDate(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
       const recordYear = recordDate.format('YYYY');
       const recordMonth = parseInt(recordDate.format('MM'));
 
@@ -56,7 +57,8 @@ export const TBDSTReport: React.FC<TBDSTReportProps> = ({ patients, currentFisca
     
     const prevYear = (parseInt(selectedYear) - 1).toString();
     return patients.filter(p => {
-      const recordDate = new NepaliDate(p.registrationDate);
+      const parts = p.registrationDate.split(/[-/]/);
+      const recordDate = new NepaliDate(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
       const recordYear = recordDate.format('YYYY');
       const recordMonth = parseInt(recordDate.format('MM'));
       
